@@ -4,3 +4,5 @@ matplotlib
 seaborn
 jupyter
 folium
+scikit-learn
+joblib
