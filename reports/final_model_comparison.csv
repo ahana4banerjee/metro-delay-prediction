@@ -1,0 +1,9 @@
+Model,RMSE,MAE,R2 Score
+XGBoost Regressor,1.1449,0.8295,0.9403
+Random Forest Regressor,1.1595,0.8415,0.9388
+Linear Regression,1.3252,0.9768,0.92
+Decision Tree Regressor,1.6469,1.2139,0.8765
+Custom Model (Heavy Prev Delay),1.8655,1.4491,0.8415
+Custom Model (Enhanced),1.9807,1.4484,0.8213
+Custom Model (Balanced),2.4584,2.0463,0.7247
+Custom Model (Heavy Congestion),2.4632,2.0572,0.7237
