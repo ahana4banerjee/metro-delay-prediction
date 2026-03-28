@@ -6,3 +6,4 @@ jupyter
 folium
 scikit-learn
 joblib
+xgboost
