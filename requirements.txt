@@ -7,3 +7,4 @@ folium
 scikit-learn
 joblib
 xgboost
+streamlit
