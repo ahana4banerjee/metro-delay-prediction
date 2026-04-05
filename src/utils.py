@@ -60,13 +60,15 @@ def get_ui_station_mappings(station_encoder, station_mapping):
     return sorted(unique_names), name_to_raw_id
 
 def get_route_from_station(station_name, available_routes):
-    stat_upper = str(station_name).upper()
-    if "NAGOLE" in stat_upper or "RAIDURG" in stat_upper:
-        return next((r for r in available_routes if 'BLUE' in r.upper()), available_routes[0])
-    elif "PARADE" in stat_upper or "JBS" in stat_upper:
-        return next((r for r in available_routes if 'GREEN' in r.upper()), available_routes[0])
-    else:
-        return next((r for r in available_routes if 'RED' in r.upper()), available_routes[0])
+    """Infers the route by checking which actual line the station belongs to."""
+    red_route = next((r for r in available_routes if 'RED' in str(r).upper()), available_routes[0])
+    blue_route = next((r for r in available_routes if 'BLUE' in str(r).upper()), available_routes[0])
+    green_route = next((r for r in available_routes if 'GREEN' in str(r).upper()), available_routes[0])
+
+    if station_name in BLUE_LINE: return blue_route
+    elif station_name in GREEN_LINE: return green_route
+    elif station_name in RED_LINE: return red_route
+    else: return red_route # Fallback
 
 
 def get_stop_sequence(station_name, route_name):

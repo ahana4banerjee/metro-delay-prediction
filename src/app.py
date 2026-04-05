@@ -135,7 +135,7 @@ if st.button("Predict Trip Delay", type="primary", use_container_width=True):
     with col3:
         st.markdown(f"""
             <div style="background-color: #1a5276; padding: 15px; border-radius: 8px; color: white; text-align: center;">
-                <h4 style="margin:0; color: white;">Est. Arrival Time</h4>
+                <h4 style="margin:0; color: white;">Est. Duration</h4>
                 <h1 style="margin:0; font-size: 2.5rem; color: white;">{total_trip_time:.0f} m</h1>
             </div>
         """, unsafe_allow_html=True)
