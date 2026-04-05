@@ -88,26 +88,37 @@ def get_stop_sequence(station_name, route_name):
     return 5 # Safe fallback if something goes wrong
 
 def estimate_stops_between(source_name, dest_name):
-    """Calculates exact stops using real metro line topography."""
+    """Calculates exact stops using real metro line topography (robust string matching)."""
     lines = [RED_LINE, BLUE_LINE, GREEN_LINE]
+    
+    # Helper function to remove spaces, dots, and make uppercase for perfect matching
+    def normalize(name):
+        return str(name).upper().replace(" ", "").replace(".", "")
+        
+    norm_source = normalize(source_name)
+    norm_dest = normalize(dest_name)
     
     # 1. Check if they are on the same line
     for line in lines:
-        if source_name in line and dest_name in line:
-            return abs(line.index(source_name) - line.index(dest_name))
+        norm_line = [normalize(station) for station in line]
+        if norm_source in norm_line and norm_dest in norm_line:
+            return abs(norm_line.index(norm_source) - norm_line.index(norm_dest))
             
     # 2. If different lines, route through a major interchange
-    interchanges = ['Ameerpet', 'MG Bus Station', 'Parade Ground']
+    # Added 'JBS Parade Ground' as a safety net for Green/Blue line swaps
+    interchanges = ['Ameerpet', 'MG Bus Station', 'Parade Ground', 'JBS Parade Ground']
     best_dist = 999
     
     for interchange in interchanges:
-        dist1 = 999
-        dist2 = 999
+        norm_interchange = normalize(interchange)
+        dist1, dist2 = 999, 999
+        
         for line in lines:
-            if source_name in line and interchange in line:
-                dist1 = abs(line.index(source_name) - line.index(interchange))
-            if dest_name in line and interchange in line:
-                dist2 = abs(line.index(dest_name) - line.index(interchange))
+            norm_line = [normalize(station) for station in line]
+            if norm_source in norm_line and norm_interchange in norm_line:
+                dist1 = abs(norm_line.index(norm_source) - norm_line.index(norm_interchange))
+            if norm_dest in norm_line and norm_interchange in norm_line:
+                dist2 = abs(norm_line.index(norm_dest) - norm_line.index(norm_interchange))
         
         # If a valid path through this interchange exists, check if it's the shortest
         if dist1 != 999 and dist2 != 999:
