@@ -8,3 +8,5 @@ scikit-learn
 joblib
 xgboost
 streamlit
+tensorflow
+keras

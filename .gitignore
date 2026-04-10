@@ -3,3 +3,5 @@ __pycache__/
 .env
 data/raw/*
 models/*
+.venv_new/
+.venv/
