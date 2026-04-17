@@ -1,245 +1,189 @@
-# Metro Train Delay Prediction
+# 🚇 Smart Delay Prediction in Hyderabad Metro Systems
 
 ![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
 ![ML](https://img.shields.io/badge/Machine%20Learning-Scikit--Learn%20%7C%20XGBoost-orange)
 ![Status](https://img.shields.io/badge/Status-Active-success)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-## Overview
-This project presents a **machine learning-driven framework** for **predicting metro train delays** using structured transit schedule data enriched with operational dynamics.
+### Using Hybrid Machine Learning and Operational Insights
 
-To ensure robustness and real-world relevance, the developed approach was validated on an independent **Indian Railways delay dataset**, where it demonstrated **consistent performance metrics and behavioral patterns**, confirming strong generalization across large-scale rail networks.
+> A machine learning framework to predict Hyderabad Metro train delays using GTFS schedule data, realistic delay simulation, operational insights, and cross-validation on Indian Railways data.
 
----
+-----
 
-## Objective
-The goal is to accurately predict train delay (in minutes) using key transit and operational features:
+## 📌 Overview
 
-- Station information
-- Time of day
-- Peak vs non-peak hours
-- Stop sequence (trip progression)
-- Route direction
-- Interchange congestion impact
-- Delay propagation
+Metro systems depend heavily on punctuality. Even small delays can propagate across downstream stations, impacting schedules, passenger trust, and operational efficiency.
 
----
+This project builds a **delay prediction system** for Hyderabad Metro using:
 
-## Tech Stack
-- Python
-- Pandas, NumPy
-- Scikit-learn, XGBoost
-- Matplotlib, Seaborn
-- Folium (for map visualization)
-- Joblib (model persistence)
-- Streamlit (for dashboard)
+  * **GTFS schedule data** as the foundation
+  * **Delay simulation** (modeling realistic scenarios where public data is unavailable)
+  * **Machine Learning models** (Regression and Time-Series)
+  * **Hybrid operational logic** for propagation tracking
+  * **Interactive Streamlit dashboard** for real-time visualization
+  * **External validation** using Indian Railways dataset
 
----
+The project demonstrates how data-driven methods can support smarter urban transit systems.
 
-## Project Structure
+-----
+
+## 🎯 Objectives
+
+  * Predict train delays at station/time level.
+  * Identify and understand key factors causing delays (Peak hours, Congestion).
+  * Compare performance across multiple ML models (XGBoost, Random Forest, LSTM).
+  * Validate model robustness on real-world Indian Railways data.
+  * Provide a user-friendly dashboard for operational decision support.
+
+-----
+
+## 🗂 Datasets
+
+### 1\. Hyderabad Metro GTFS Dataset
+
+Structured transit schedule data containing:
+
+  * `agency.txt`, `routes.txt`, `trips.txt`
+  * `stop_times.txt`, `stops.txt`, `calendar.txt`
+  * `shapes.txt`, `fare_rules.txt`, `fare_attributes.txt`, `feed_info.txt`
+
+### 2\. Indian Railways Delay Dataset
+
+Used for external validation to test the generalization of models on real-world delay behavior.
+
+-----
+
+## ⚙️ Core Methodology
+
+### 🧠 Delay Simulation Logic
+
+Since real Hyderabad Metro delay data is not publicly available, delays were simulated using a multi-factor formula:
+$$Delay = Base + Peak + Congestion + Propagation + Noise$$
+
+Key factors included:
+
+  * **Peak-hour congestion:** Higher weight during morning/evening rushes.
+  * **Interchange stations:** Increased dwell time at busy hubs.
+  * **Propagation:** Delay from the previous station carried forward.
+
+### 🏗 Feature Engineering
+
+  * **Temporal:** Hour of day, Day of week, Peak/Non-peak flags.
+  * **Spatial:** Station encoding, Route encoding, Stop sequence.
+  * **Sequential:** Previous station delay, delay propagation component.
+  * **Operational:** Interaction terms (Peak × Congestion).
+
+-----
+
+## 🤖 Model Performance
+
+### 📊 Metro Dataset Results
+
+| Model | RMSE | MAE | $R^2$ |
+| :--- | :--- | :--- | :--- |
+| **XGBoost** | **1.144** | **0.829** | **0.940** |
+| Random Forest | 1.159 | 0.841 | 0.938 |
+| Linear Regression | 1.325 | 0.976 | 0.913 |
+| LSTM | 1.352 | 1.025 | 0.920 |
+
+### 🚆 Indian Railways Validation
+
+| Model | RMSE | MAE | $R^2$ |
+| :--- | :--- | :--- | :--- |
+| Random Forest | 7.16 | 3.21 | 0.97 |
+| **XGBoost** | **8.13** | **2.97** | **0.96** |
+| LSTM | 13.86 | 6.86 | 0.88 |
+| Linear Regression | 15.66 | 7.81 | 0.85 |
+
+**Key Insight:** Tree-based ensemble models (XGBoost/Random Forest) maintained the strongest performance and generalization across both datasets.
+
+-----
+
+## 🔍 Key Findings
+
+1.  **Previous Delay:** The strongest predictor of future delay (propagation effect).
+2.  **Peak Hours:** Significantly increase delay variance.
+3.  **Busy Hubs:** Interchange stations show higher delay tendencies.
+4.  **Generalization:** Models trained on simulated logic successfully identified patterns in real Indian Railways data.
+
+-----
+
+## 💻 Dashboard Features
+
+Built using **Streamlit**, the dashboard provides:
+
+  * **User Inputs:** Source station, Destination, Day, and Time.
+  * **Real-time Predictions:** Predicted delay and estimated arrival time.
+  * **Operational Alerts:** Peak-hour warnings and delay severity levels.
+
+-----
+
+## 🛠 Tech Stack
+
+  * **Language:** Python
+  * **Data Science:** Pandas, NumPy, Scikit-learn
+  * **ML Models:** XGBoost, TensorFlow (LSTM)
+  * **Visualization:** Matplotlib, Seaborn
+  * **Deployment:** Streamlit
+  * **Serialization:** Joblib
+
+-----
+
+## 📁 Project Structure
 
 ```text
 metro-delay-prediction/
-│
-├── data/
-│   ├── raw/   # Static Hyderabad GTFS Dataset
-│   ├── processed/   # Processed dataset for ML
-|   ├── indian_rail_delay/  # Indian Railways Delay Dataset for validation 
-│
-├── notebooks/
-    ├── data_exploration.ipynb
-│   ├── feature_engineering.ipynb
-│   ├── advanced_preprocessing.ipynb
-|   ├── validation_indian_rail.ipynb
-│
-├── src/
-|   ├── config.py
-│   ├── utils.py
-│   ├── app.py
-
-│
-├── models/
-│
-├── reports/
-|   ├── figures
-│   ├── validation_results
-|   ├── cross_dataset_analysis
-│
-├── requirements.txt
-├── README.md
-└── .gitignore
+│── data/
+│   ├── raw/               # Original GTFS files
+│   ├── processed/         # Cleaned features
+│   └── validation/       # Indian Railways data
+│── notebooks/             # EDA & Model Training
+│── src/                   # Python scripts for logic
+│── models/                # Saved .pkl and .h5 files
+│── app.py                 # Streamlit dashboard
+│── requirements.txt       # Dependencies
+└── README.md
 ```
 
----
+-----
 
-## Methodology
+## 🚀 Local Setup
 
-### Data Processing & Enrichment
+1.  **Clone the Repo**
 
-- GTFS schedule ingestion and normalization
-- Temporal and route-based structuring
-- Incorporation of operational delay dynamics
+    ```bash
+    git clone https://github.com/ahana4banerjee/metro-delay-prediction.git
+    cd metro-delay-prediction
+    ```
 
-### Feature Engineering
+2.  **Install Dependencies**
 
-- Time-based features (hour, peak indicators)
-- Route progression (stop index)
-- Station importance and interchange encoding
-- Delay propagation modeling
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-### Model Development
+3.  **Run the Dashboard**
 
-- Linear Regression
-- Decision Tree
-- Random Forest
-- XGBoost
-- Custom Weighted Delay Model
+    ```bash
+    streamlit run app.py
+    ```
 
-## Workflow
-1. Data Collection
-2. Data Cleaning
-3. Delay Simulation
-4. Feature Engineering
-5. Model Training
-   - Linear Regression
-   - Decision Tree
-   - Random Forest
-   - XGBoost 
-   - Custom Weighted Delay Model
-7. Evaluation Metrics
-   - MAE
-   - RMSE
-   - R² Score
-8. Visualization
-9. Dashboard Integration using Streamlit
+-----
 
----
+## 🏁 Conclusion
 
-## Observations & Insights (Metro Data)
+This project successfully combines data engineering, delay simulation, and ensemble learning to create a scalable metro delay prediction framework. It proves that even in the absence of public historical data, reliable predictions can be built using operational insights and smart simulation.
 
-- Peak hours significantly increase delays
-- Interchange stations show consistent congestion
-- Delay propagation is a dominant factor
-- Tree-based models outperform linear models
-- Custom model is interpretable but less accurate
+-----
 
----
+## 👩‍💻 Author
 
-## Cross Dataset Validation using Indian Railways Dataset
+**Ahana Banerjee** 
 
-The approach was rigorously validated on an independent Indian Railways delay dataset to assess real-world applicability.
+*3rd Year, ECE IDP, JNTUH*
 
-### Observations and Inference
+[![LinkedIn](https://img.shields.io/badge/-LinkedIn-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://linkedin.com/in/ahana-4-banerjee)
+[![Gmail](https://img.shields.io/badge/-Gmail-D14836?style=flat&logo=gmail&logoColor=white)](mailto:banerjeeahana4@gmail.com)
+[![Portfolio](https://img.shields.io/badge/-Portfolio-121013?style=flat&logo=vercel&logoColor=white)](https://portfolio-website-seven-roan-36.vercel.app/)
 
-- Comparable performance metrics (MAE, RMSE, R² trends) across datasets
-- Strong consistency in peak-hour delay behavior
-- Similar delay propagation patterns observed
-- Major stations/junctions exhibit higher delay impact
-- Right-skewed delay distribution replicated
-- Tree-based models consistently outperform linear models
-
-### Conclusion
-
-The alignment in both quantitative performance metrics and qualitative behavioral patterns demonstrates that the model captures fundamental delay dynamics, making it robust, transferable, and reliable across different rail systems.
-
----
-
-## Dashboard
-
-An interactive interface is provided for real-time predictions.
-
-### Inputs from User
-
-- Source station
-- Destination station
-- Time of travel
-- Day/peak hour selection
-
-### Processing
-
-- Input is converted into model features
-- Same preprocessing steps are applied
-- Trained model is loaded using Joblib
-- Delay prediction is generated
-  
-### Outputs Shown
-
-- Predicted delay (in minutes)
-- Peak vs non-peak indication using colour codings
-- Total stops and estimated duration
-- Insights on peak hour, traffic, and delay
-
----
-
-## Local Setup & Execution
-
-### 1. Clone Repository
-
-```bash
-git clone <your-repo-link>
-cd metro-delay-prediction
-```
-
-### 2. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Run Notebooks
-
-#### Option A (Recommended - Manual)
-
-- Open notebooks folder
-- Run all notebooks in order:
-  - data_exploration.ipynb
-  - advanced_preprocessing.ipynb
-  - model_building.ipynb
-  - validation_indian_rail.ipynb
-- Click “Run All Cells” in each notebook
-
-#### Option B (Shortcut - CLI)
-
-```bash
-jupyter nbconvert --to notebook --execute notebooks/*.ipynb
-```
-
-### 4. Observe Outputs
-
-After running notebooks, you will get:
-
-- Graphs & visualizations
-- Delay patterns
-- Model performance metrics (MAE, RMSE, R²)
-- Summary insights
-
-### 5. Launch UI Dashboard
-
-```bash
-streamlit run src/app.py
-```
-
-### 6. Interact with Dashboard
-
-- Enter station, time, etc.
-- View predicted delay
-- Explore visual insights
-
----
-
-## Future Work
-
-- Real-time data
-- Time-series and LSTM-based modeling
-- Advanced interactive dashboard
-- API deployment
-
----
-
-### Final Note
-
-This project demonstrates a production-oriented ML pipeline with strong emphasis on generalization, validation, and system-level understanding of delay behavior, validated across multiple railway networks.
-
-
-
-    
