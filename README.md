@@ -1,15 +1,12 @@
 # 🚇 Smart Delay Prediction in Hyderabad Metro Systems
 
-![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
-![ML](https://img.shields.io/badge/Machine%20Learning-Scikit--Learn%20%7C%20XGBoost-orange)
-![Status](https://img.shields.io/badge/Status-Active-success)
-![License](https://img.shields.io/badge/License-MIT-green)
-
 ### Using Hybrid Machine Learning and Operational Insights
 
 > A machine learning framework to predict Hyderabad Metro train delays using GTFS schedule data, realistic delay simulation, operational insights, and cross-validation on Indian Railways data.
 
 -----
+
+**Live Demo:** [https://metro-delay-prediction.streamlit.app](https://metro-delay-prediction.streamlit.app/)
 
 ## 📌 Overview
 
@@ -111,11 +108,19 @@ Key factors included:
 
 ## 💻 Dashboard Features
 
+### 🌐 Try the Live App
+https://metro-delay-prediction.streamlit.app/
+
 Built using **Streamlit**, the dashboard provides:
 
   * **User Inputs:** Source station, Destination, Day, and Time.
   * **Real-time Predictions:** Predicted delay and estimated arrival time.
   * **Operational Alerts:** Peak-hour warnings and delay severity levels.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/613a75a6-688e-4a1c-8c12-33de875159bd" width="48%" />
+  <img src="https://github.com/user-attachments/assets/49bfca37-421e-4140-a8f0-8ffe216097ac" width="48%" />
+</p>
 
 -----
 
@@ -166,7 +171,7 @@ metro-delay-prediction/
 3.  **Run the Dashboard**
 
     ```bash
-    streamlit run app.py
+    streamlit run src/app.py
     ```
 
 -----
