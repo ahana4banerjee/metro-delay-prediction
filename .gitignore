@@ -1,9 +1,5 @@
 __pycache__/
 *.pyc
 .env
-models/*
 .venv_new/
 .venv/
-data/raw/*
-!data/raw/.gitkeep
-!models/.gitkeep

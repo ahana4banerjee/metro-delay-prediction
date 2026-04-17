@@ -1,0 +1,4 @@
+route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route_text_color,route_sort_order
+RED,HMRL,C1_RED,Miyapur - LB Nagar - Miyapur - C1,1,E31E24,FFFFFF,1
+GREEN,HMRL,C2_GREEN,JBS Parade Ground - MG Bus Station - JBS Parade Ground - C2,1,009846,000000,2
+BLUE,HMRL,C3_BLUE,Nagole - Raidurg - Nagole - C3,1,007ABB,000000,3
