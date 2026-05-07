@@ -12,7 +12,7 @@ SECTION 1: EDA KEY INSIGHTS
 
 SECTION 2: MODEL PERFORMANCE
 ---------------------------------------------------------
-- The best performing model on the metro dataset was XGBoost, achieving an RMSE of 1.1448583040633507 and an MAE of 0.8295333007970144 minutes.
+- The best performing model on the metro dataset was Hybrid (XGB+OAS), achieving an RMSE of 0.9459163566074685 and an MAE of 0.7032901238993414 minutes.
 - XGBoost and Random Forest delivered the strongest overall performance, confirming the importance of nonlinear learning for operational transit systems.
 - Linear Regression served as a baseline model with lower predictive strength.
 - LSTM showed moderate performance by capturing sequential delay dependencies, but required more data and tuning than tree-based models.
@@ -45,8 +45,8 @@ SECTION 6: EXTERNAL VALIDATION (INDIAN RAILWAYS DATASET)
 
 SECTION 7: CONCLUSION
 ---------------------------------------------------------
-- Final Recommended Model: XGBoost
+- Final Recommended Model: Hybrid (XGB+OAS)
 - Practical Implication: Delay prediction is feasible using GTFS schedules, engineered operational features, and machine learning.
-- Deployment through a dashboard can provide passengers and operators with delay estimates within an average margin of ~0.8295333007970144 minutes.
+- Deployment through a dashboard can provide passengers and operators with delay estimates within an average margin of ~0.7032901238993414 minutes.
 - The system offers a scalable foundation for future real-time metro analytics.
 =========================================================

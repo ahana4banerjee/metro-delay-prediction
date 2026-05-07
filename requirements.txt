@@ -10,3 +10,4 @@ xgboost
 streamlit
 tensorflow
 keras
+shap
