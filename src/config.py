@@ -1,11 +1,43 @@
 # src/config.py
 
-FEATURE_COLUMNS = [
-    'station_id_encoded', 'hour', 'is_peak', 'station_congestion', 
-    'stop_sequence', 'prev_delay', 'route_encoded', 
-    'day_of_week', 'is_weekend'
+# ==========================================
+# RESEARCH FRAMEWORK FEATURES (DECOUPLED)
+# ==========================================
+# 1. Base features that the XGBoost model was trained on
+BASE_FEATURES = [
+    'station_id_encoded', 'hour', 'is_peak', 'stop_sequence', 
+    'prev_delay', 'route_encoded', 'day_of_week', 'is_weekend'
 ]
 
+# 2. External features used exclusively by the Operational Adjustment Score (OAS)
+EXTERNAL_FEATURES = [
+    'weather_severity', 'event_intensity', 'station_congestion', 'recovery_factor'
+]
+
+# 3. Hybrid Blending Weights (Determined via optimization in notebook)
+HYBRID_ALPHA = 0.95  # Weight of the XGBoost ML Model
+HYBRID_BETA = 1.10   # Weight of the Operational Adjustment Score
+
+# ==========================================
+# UI MAPPINGS FOR ENVIRONMENTAL FACTORS
+# ==========================================
+WEATHER_CONDITIONS = {
+    'Clear / Normal': 0.0,
+    'Light Rain / Drizzle': 1.0,
+    'Heavy Rain / Storm': 2.0,
+    'Extreme Weather (Black Swan)': 3.5
+}
+
+EVENT_INTENSITY = {
+    'No Event (Standard Ops)': 0.0,
+    'Minor Local Event': 0.3,
+    'Medium (Office Rush / Weekend Mall)': 0.6,
+    'Major (IPL Match / Festival)': 1.0
+}
+
+# ==========================================
+# EXISTING CONSTANTS
+# ==========================================
 CONGESTION_WEIGHTS = {
     'Ameerpet': 3.5,
     'MG Bus Station': 3.0,
@@ -19,8 +51,6 @@ DAYS_OF_WEEK = {
     'Thursday': 3, 'Friday': 4, 'Saturday': 5, 'Sunday': 6
 }
 
-# --- NEW: REAL METRO LINE SEQUENCES FOR DISTANCE CALCULATION ---
-
 RED_LINE = [
     'Miyapur', 'JNTU College', 'KPHB Colony', 'Kukatpally', 'Balanagar', 
     'Moosapet', 'Bharat Nagar', 'Erragadda', 'ESI Hospital', 'SR Nagar', 
@@ -31,14 +61,15 @@ RED_LINE = [
 ]
 
 BLUE_LINE = [
-    'Nagole', 'Uppal', 'Stadium', 'NGRI', 'Habsiguda', 'Tarnaka', 'Mettuguda', 
-    'Secunderabad East', 'Parade Ground', 'Paradise', 'Rasoolpura', 'Prakash Nagar', 
-    'Begumpet', 'Ameerpet', 'Madhura Nagar', 'Yusufguda', 'Road No 5 Jubilee Hills', 
-    'Jubilee Hills Check Post', 'Peddamma Temple', 'Madhapur', 'Durgam Cheruvu', 
-    'HITEC City', 'Raidurg'
+    'Raidurg', 'Hitec City', 'Durgam Cheruvu', 'Madhapur', 'Peddamma Gudi', 
+    'Jubilee Hills Check Post', 'Road No 5 Jubilee Hills', 'Yusufguda', 
+    'Madura Nagar', 'Ameerpet', 'Begumpet', 'Prakash Nagar', 'Rasoolpura', 
+    'Paradise', 'Parade Ground', 'Secunderabad East', 'Mettuguda', 
+    'Tarnaka', 'Habsiguda', 'NGRI', 'Stadium', 'Uppal', 'Nagole'
 ]
 
 GREEN_LINE = [
-    'JBS Parade Ground', 'Secunderabad West', 'Gandhi Hospital', 'Musheerabad', 
-    'RTC Cross Roads', 'Chikkadpally', 'Narayanaguda', 'Sultan Bazar', 'MG Bus Station'
+    'JBS Parade Ground', 'Secunderabad West', 'Gandhi Hospital', 
+    'Musheerabad', 'RTC Cross Roads', 'Chikkadpally', 'Narayanguda', 
+    'Sultan Bazar', 'MG Bus Station'
 ]

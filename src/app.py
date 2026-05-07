@@ -1,16 +1,16 @@
 # src/app.py
 import streamlit as st
-from config import DAYS_OF_WEEK
+import pandas as pd
+from config import DAYS_OF_WEEK, WEATHER_CONDITIONS, EVENT_INTENSITY
 from utils import (
     load_artifacts, load_station_mapping, get_ui_station_mappings, derive_features, 
-    make_prediction, get_contextual_feedback, get_route_from_station, 
-    estimate_stops_between, estimate_total_delay, get_dynamic_travel_time, get_stop_sequence
+    make_prediction, get_contextual_feedback, estimate_total_delay
 )
 
-# --- PAGE CONFIG ---
-st.set_page_config(page_title="Metro Delay Predictor", page_icon="🚇", layout="wide")
+# --- PAGE CONFIG ---\
+st.set_page_config(page_title="Hybrid Metro Predictor", page_icon="🚇", layout="wide")
 
-# --- LOAD ARTIFACTS & MAPPINGS ---
+# --- LOAD ARTIFACTS & MAPPINGS ---\
 @st.cache_resource
 def init_models():
     return load_artifacts()
@@ -18,134 +18,105 @@ def init_models():
 try:
     model, scaler, station_encoder, route_encoder = init_models()
     station_mapping = load_station_mapping()
-    
-    # Generate clean, unique UI names and the reverse lookup dictionary
     unique_station_names, name_to_raw_id = get_ui_station_mappings(station_encoder, station_mapping)
-    available_routes = list(route_encoder.classes_)
 except Exception as e:
-    st.error(f"Error loading models or mapping data: {e}")
+    st.error(f"Error loading framework architectures: {e}")
     st.stop()
 
-# --- HEADER ---
-st.title("🚇 Metro Train Delay Predictor")
-st.markdown("Plan your trip and predict real-time transit delays using our **XGBoost AI Engine**.")
+# --- HEADER ---\
+st.title("🚇 Hybrid Intelligent Metro Delay Framework")
+st.markdown("""
+*Research Prototype:* This dashboard integrates an **XGBoost Machine Learning Schedule Predictor** with a 
+**Domain-Driven Operational Adjustment Score (OAS)** to predict delays under severe environmental disruptions.
+""")
 st.divider()
 
-# --- SIDEBAR INPUTS ---
-st.sidebar.header("📍 Trip Details")
+# --- SIDEBAR CONTROLS ---\
+st.sidebar.header("📍 1. Schedule & Routing")
+selected_day = st.sidebar.selectbox("Day of Week", list(DAYS_OF_WEEK.keys()))
+hour_of_day = st.sidebar.slider("Hour of Day (24H)", min_value=6, max_value=23, value=8)
 
-# UI now displays ONLY unique, human-readable names
-source_name = st.sidebar.selectbox("From Station (Source)", unique_station_names, index=0)
-
-# Default destination
-default_dest_idx = 5 if len(unique_station_names) > 5 else 1
-dest_name = st.sidebar.selectbox("To Station (Destination)", unique_station_names, index=default_dest_idx)
-
-if source_name == dest_name:
-    st.sidebar.error("⚠️ Source and Destination cannot be the same.")
-    st.error("Please select a valid destination station to proceed.")
-    st.stop()
+source_station = st.sidebar.selectbox("Origin Station", unique_station_names, index=0)
+dest_station = st.sidebar.selectbox("Destination Station", unique_station_names, index=len(unique_station_names)-1)
 
 st.sidebar.divider()
-st.sidebar.header("⏱️ Commuter Parameters")
-
-hour = st.sidebar.slider("Time of Day (Hour)", min_value=0, max_value=23, value=9)
-selected_day_str = st.sidebar.selectbox("Day of the Week", list(DAYS_OF_WEEK.keys()))
+st.sidebar.header("🌪️ 2. Environmental Disruptions")
+st.sidebar.markdown("*Test the Hybrid framework's resilience.*")
+weather_ui = st.sidebar.selectbox("Current Weather", list(WEATHER_CONDITIONS.keys()))
+event_ui = st.sidebar.selectbox("Event & Crowding", list(EVENT_INTENSITY.keys()))
 
 st.sidebar.divider()
-st.sidebar.header("⚙️ Live Network Data (Simulation)")
+prev_delay_input = st.sidebar.number_input("Incoming Network Delay (Mins)", min_value=0.0, max_value=30.0, value=0.0, step=0.5,
+                                           help="Simulates if the train is already late arriving at your origin.")
 
-st.sidebar.caption("In a live app, this is fetched from metro APIs. Adjust to simulate incoming delays.")
-prev_delay = st.sidebar.slider("Live Delay of Incoming Train (mins)", min_value=0.0, max_value=30.0, value=0.0, step=0.5)
+# --- MAIN PREDICTION LOGIC ---\
+if st.button("🚀 Run Hybrid Delay Prediction", use_container_width=True):
+    if source_station == dest_station:
+        st.warning("Origin and Destination cannot be the same.")
+    else:
+        with st.spinner("Executing Decoupled Feature Architecture..."):
+            
+            # Map Inputs
+            day_int = DAYS_OF_WEEK[selected_day]
+            weather_val = WEATHER_CONDITIONS[weather_ui]
+            event_val = EVENT_INTENSITY[event_ui]
+            source_raw_id = name_to_raw_id.get(source_station, 'Unknown')
+            
+            # 1. Predict Current Station Delay (Breakdown Analysis)
+            features_df = derive_features(
+                source_raw_id, hour_of_day, day_int, prev_delay_input, 
+                station_encoder, route_encoder, source_station,
+                weather_val, event_val
+            )
+            
+            current_delay, xgb_ml_pred, oas_physics_score = make_prediction(features_df, model, scaler)
+            
+           # 2. Predict Total Trip Propagation
+            total_delay, trip_time, stops = estimate_total_delay(
+                source_station, dest_station, hour_of_day, day_int, 
+                station_encoder, route_encoder, name_to_raw_id,
+                weather_val, event_val, model, scaler, prev_delay_input # <-- Added prev_delay_input
+            )
 
-# --- AUTO-INFER & DERIVE FEATURES ---
-inferred_route = get_route_from_station(source_name, available_routes)
-day_val = DAYS_OF_WEEK[selected_day_str]
-is_peak, is_weekend, stat_congestion = derive_features(hour, day_val, source_name)
-stops_to_go = estimate_stops_between(source_name, dest_name)
-
-# NEW: Automatically calculate the stop sequence!
-stop_seq = get_stop_sequence(source_name, inferred_route)
-
-# --- DYNAMIC TRAVEL TIME ---
-avg_mins_per_stop = get_dynamic_travel_time(is_peak, is_weekend)
-base_travel_time = round(stops_to_go * avg_mins_per_stop)
-
-with st.container():
-    col_a, col_b, col_c = st.columns(3)
-    col_a.info(f"🛣️ **Detected Route:** {inferred_route}")
-    col_b.success(f"📊 **Traffic Status:** {'Peak Hour 🔴' if is_peak else 'Off-Peak 🟢'}")
-    col_c.success(f"📅 **Day Type:** {'Weekend 🌴' if is_weekend else 'Weekday 🏢'}")
-st.divider()
-
-# --- PREDICTION LOGIC ---
-if st.button("Predict Trip Delay", type="primary", use_container_width=True):
-    
-    # 1. Lookup the raw ID from our dictionary using the clean name
-    raw_station_id = name_to_raw_id[source_name]
-    
-    # 2. Transform that raw ID into the ML encoded format
-    station_encoded = station_encoder.transform([raw_station_id])[0]
-    
-    route_encoded = route_encoder.transform([inferred_route])[0]
-    
-    input_features = {
-        'station_id_encoded': station_encoded,
-        'hour': hour,
-        'is_peak': is_peak,
-        'station_congestion': stat_congestion,
-        'stop_sequence': stop_seq,
-        'prev_delay': prev_delay,
-        'route_encoded': route_encoded,
-        'day_of_week': day_val,
-        'is_weekend': is_weekend
-    }
-    
-    # Predict Current Delay
-    current_delay = make_prediction(model, scaler, input_features)
-    color, status, explanation = get_contextual_feedback(current_delay, is_peak, prev_delay)
-    
-    # Calculate Total Trip Estimates using dynamic network logic
-    total_delay = estimate_total_delay(current_delay, stops_to_go, is_peak, stat_congestion)
-    total_trip_time = base_travel_time + total_delay
-    
-   # --- MAIN PANEL OUTPUT ---
-    st.subheader(f"Trip Overview: {source_name} ➔ {dest_name}")
-    st.write(f"**Distance:** {stops_to_go} stops | **Standard Travel Time:** {base_travel_time} mins")
-    
-    # Layout columns
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.markdown(f"""
-            <div style="background-color: {color}; padding: 15px; border-radius: 8px; color: white; text-align: center;">
-                <h4 style="margin:0; color: white;">Current Station Delay</h4>
-                <h1 style="margin:0; font-size: 2.5rem; color: white;">{current_delay:.1f} m</h1>
-            </div>
-        """, unsafe_allow_html=True)
+        # --- RESULTS DASHBOARD ---\
+        st.success(f"Trip Details: **{source_station}** ➔ **{dest_station}** ({stops} stops)")
         
-    with col2:
-        st.markdown(f"""
-            <div style="background-color: #2e4053; padding: 15px; border-radius: 8px; color: white; text-align: center;">
-                <h4 style="margin:0; color: white;">Total Trip Delay</h4>
-                <h1 style="margin:0; font-size: 2.5rem; color: white;">{total_delay:.1f} m</h1>
-            </div>
-        """, unsafe_allow_html=True)
+        col1, col2, col3 = st.columns(3)
         
-    with col3:
-        st.markdown(f"""
-            <div style="background-color: #1a5276; padding: 15px; border-radius: 8px; color: white; text-align: center;">
-                <h4 style="margin:0; color: white;">Est. Duration</h4>
-                <h1 style="margin:0; font-size: 2.5rem; color: white;">{total_trip_time:.0f} m</h1>
-            </div>
-        """, unsafe_allow_html=True)
+        with col1:
+            st.markdown(f"""
+                <div style="background-color: #1E3A8A; padding: 15px; border-radius: 8px; color: white; text-align: center; border: 2px solid #3B82F6;">
+                    <h4 style="margin:0; color: #93C5FD;">Origin Delay</h4>
+                    <h1 style="margin:0; font-size: 2.8rem; color: white;">{current_delay:.1f} <span style="font-size:1.2rem;">min</span></h1>
+                </div>
+            """, unsafe_allow_html=True)
+            
+        with col2:
+            st.markdown(f"""
+                <div style="background-color: #374151; padding: 15px; border-radius: 8px; color: white; text-align: center; border: 2px solid #6B7280;">
+                    <h4 style="margin:0; color: #D1D5DB;">Total Trip Delay</h4>
+                    <h1 style="margin:0; font-size: 2.8rem; color: white;">{total_delay:.1f} <span style="font-size:1.2rem;">min</span></h1>
+                </div>
+            """, unsafe_allow_html=True)
+            
+        with col3:
+            st.markdown(f"""
+                <div style="background-color: #064E3B; padding: 15px; border-radius: 8px; color: white; text-align: center; border: 2px solid #10B981;">
+                    <h4 style="margin:0; color: #6EE7B7;">Total Travel Time</h4>
+                    <h1 style="margin:0; font-size: 2.8rem; color: white;">{(trip_time + total_delay):.0f} <span style="font-size:1.2rem;">min</span></h1>
+                </div>
+            """, unsafe_allow_html=True)
 
-    st.write("")
-    st.info(f"**AI Insight:** {status} — {explanation}")
-    
-    min_range = max(0, round(current_delay - 2.5, 1))
-    max_range = round(current_delay + 2.5, 1)
-    st.caption(f"*Boarding window at {source_name}: {min_range} to {max_range} minutes delay.*")
+        st.write("")
+        st.info(get_contextual_feedback(current_delay, oas_physics_score, features_df.iloc[0]['is_peak'], weather_val))
 
-    with st.expander("🛠️ View Input Data & ML Features "):
-        st.json(input_features)
+        # --- RESEARCH METRICS BREAKDOWN (The "Novelty" display) ---
+        st.markdown("### 🔬 Hybrid Model Decoupling Breakdown")
+        st.markdown("*This section demonstrates the internal blending of the Machine Learning baseline with the Operational Adjustment Score.*")
+        
+        b_col1, b_col2, b_col3 = st.columns(3)
+        b_col1.metric("🤖 XGBoost (Schedule Data)", f"{xgb_ml_pred:.2f} min", help="Prediction based purely on time and routing.")
+        b_col2.metric("🌪️ OAS (Physics/Environment)", f"+ {oas_physics_score:.2f} impact", help="Heuristic calculation of weather and events.")
+        
+        recovery_pct = features_df.iloc[0]['recovery_factor'] * 100
+        b_col3.metric("⏱️ System Resilience (Recovery)", f"- {recovery_pct:.0f}%", help="Trains catch up time during off-peak or terminal approaches.")
