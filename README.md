@@ -184,8 +184,10 @@ Built using **Streamlit**, the dashboard provides:
   * **Operational Alerts:** Peak-hour warnings and delay severity levels.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/613a75a6-688e-4a1c-8c12-33de875159bd" width="48%" />
-  <img src="https://github.com/user-attachments/assets/49bfca37-421e-4140-a8f0-8ffe216097ac" width="48%" />
+ <img width="1906" height="900" alt="image" src="https://github.com/user-attachments/assets/33ecd809-e7f1-4100-92bc-d13cfb834de1" />
+</p>
+<p align="center">
+ <img width="1880" height="861" alt="image" src="https://github.com/user-attachments/assets/2c6d8bf3-ec79-4314-b44c-c041e287eb2d" />
 </p>
 
 -----
