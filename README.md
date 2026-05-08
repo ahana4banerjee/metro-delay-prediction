@@ -51,27 +51,54 @@ Used for external validation to test the generalization of models on real-world 
 
 -----
 
-## ⚙️ Core Methodology
+## ⚙️ Hybrid Prediction Framework
 
-### 🧠 Delay Simulation Logic
+The proposed framework combines:
 
-Since real Hyderabad Metro delay data is not publicly available, delays were simulated using a multi-factor formula:
-$$Delay = Base + Peak + Congestion + Propagation + Noise$$
+- Statistical delay simulation
+- Ensemble machine learning
+- Sequential operational logic
+- Explainable AI analysis
+- Real-world validation
 
-Key factors included:
+The system is designed as a hybrid operational intelligence pipeline rather than a standalone prediction model.
 
-  * **Peak-hour congestion:** Higher weight during morning/evening rushes.
-  * **Interchange stations:** Increased dwell time at busy hubs.
-  * **Propagation:** Delay from the previous station carried forward.
+### Framework Components
 
-### 🏗 Feature Engineering
-
-  * **Temporal:** Hour of day, Day of week, Peak/Non-peak flags.
-  * **Spatial:** Station encoding, Route encoding, Stop sequence.
-  * **Sequential:** Previous station delay, delay propagation component.
-  * **Operational:** Interaction terms (Peak × Congestion).
+1. GTFS-based metro schedule processing
+2. Realistic delay simulation engine
+3. Advanced feature engineering
+4. Hybrid ensemble prediction model
+5. SHAP-based explainability analysis
+6. Interactive operational dashboard
+7. External validation using Indian Railways data
 
 -----
+
+### 🤖 Hybrid Ensemble Model
+
+Instead of relying on a single prediction algorithm, the project uses a hybrid ensemble strategy combining:
+
+- XGBoost
+- Random Forest
+- Sequential operational features
+- Propagation-aware logic
+
+The hybrid architecture combines machine learning outputs with operational intelligence factors such as:
+
+- Peak-hour congestion
+- Station crowding
+- Delay propagation
+- Sequential station dependency
+
+This improves both prediction robustness and interpretability.
+
+### Why Hybrid Modeling?
+
+Traditional ML models focus only on statistical relationships.  
+This framework additionally incorporates transportation-domain operational behavior, making predictions more realistic and practically usable for metro systems.
+
+---
 
 ## 🤖 Model Performance
 
@@ -80,29 +107,68 @@ Key factors included:
 | Model | RMSE | MAE | $R^2$ |
 | :--- | :--- | :--- | :--- |
 | **XGBoost** | **1.144** | **0.829** | **0.940** |
+| **Hybrid (XGB+OAS)** | **0.945** | **0.703** | **0.964** |
 | Random Forest | 1.159 | 0.841 | 0.938 |
 | Linear Regression | 1.325 | 0.976 | 0.913 |
 | LSTM | 1.352 | 1.025 | 0.920 |
+
 
 ### 🚆 Indian Railways Validation
 
 | Model | RMSE | MAE | $R^2$ |
 | :--- | :--- | :--- | :--- |
 | Random Forest | 7.16 | 3.21 | 0.97 |
-| **XGBoost** | **8.13** | **2.97** | **0.96** |
+| **XGBoost** | **8.13** | **2.97** | **0.95** |
+| **Hybrid (XGB+OAS)** | **8.14** | **4.68** | **0.96** |
 | LSTM | 13.86 | 6.86 | 0.88 |
 | Linear Regression | 15.66 | 7.81 | 0.85 |
 
-**Key Insight:** Tree-based ensemble models (XGBoost/Random Forest) maintained the strongest performance and generalization across both datasets.
-
 -----
 
-## 🔍 Key Findings
+## 🧠 Explainable AI using SHAP
 
-1.  **Previous Delay:** The strongest predictor of future delay (propagation effect).
-2.  **Peak Hours:** Significantly increase delay variance.
-3.  **Busy Hubs:** Interchange stations show higher delay tendencies.
-4.  **Generalization:** Models trained on simulated logic successfully identified patterns in real Indian Railways data.
+To improve transparency and interpretability, SHAP (SHapley Additive exPlanations) analysis was used to understand how features influence delay predictions.
+
+### SHAP Insights
+
+The explainability analysis revealed:
+
+- `Previous Delay` is the dominant contributor to downstream delays
+- `Peak Hours` strongly increase delay probability
+- `Congestion Level` significantly affects station dwell time
+- `Stop Sequence` captures propagation behavior across routes
+
+### Why SHAP Matters
+
+Instead of treating the model as a black box, SHAP provides operational interpretability by showing:
+
+- Why a delay was predicted
+- Which features contributed most
+- How operational conditions influence predictions
+
+This makes the framework more suitable for real-world transportation decision support systems.
+
+---
+## 🔍 Key Research Findings
+
+### Operational Findings
+
+- Delay propagation is the strongest behavioral characteristic in metro systems
+- Interchange stations show consistently higher delay accumulation
+- Peak-hour congestion significantly amplifies downstream delays
+- Delay behaves as a sequential path-dependent process
+
+### Machine Learning Findings
+
+- Ensemble models outperform standalone regression approaches
+- XGBoost and Random Forest achieved strongest generalization capability
+- Hybrid operational modeling improves realism compared to pure statistical prediction
+- Explainable AI methods improve interpretability of transportation ML systems
+
+### Validation Findings
+
+- Models trained on simulated metro logic successfully generalized to real Indian Railways operational data
+- Tree-based ensemble models remained robust across structurally different datasets
 
 -----
 
@@ -124,16 +190,47 @@ Built using **Streamlit**, the dashboard provides:
 
 -----
 
+## 📄 Research Contributions
+
+This work contributes toward:
+
+- Simulation-driven delay prediction for data-scarce metro systems
+- Hybrid operational + machine learning modeling
+- Explainable AI applications in smart transportation
+- Delay propagation analytics in urban transit systems
+- Generalizable transit prediction frameworks
+
+The project bridges the gap between academic ML modeling and practical transportation operations.
+
+---
+
 ## 🛠 Tech Stack
 
-  * **Language:** Python
-  * **Data Science:** Pandas, NumPy, Scikit-learn
-  * **ML Models:** XGBoost, TensorFlow (LSTM)
-  * **Visualization:** Matplotlib, Seaborn
-  * **Deployment:** Streamlit
-  * **Serialization:** Joblib
+### Machine Learning & AI
+- Scikit-learn
+- XGBoost
+- TensorFlow / Keras
+- SHAP
 
------
+### Data Engineering
+- Pandas
+- NumPy
+
+### Visualization & Analytics
+- Matplotlib
+- Seaborn
+
+### Dashboard & Deployment
+- Streamlit
+- Joblib
+
+### Development
+- Python
+- Jupyter Notebook
+- VS Code
+- Git & GitHub
+
+---
 
 ## 📁 Project Structure
 
